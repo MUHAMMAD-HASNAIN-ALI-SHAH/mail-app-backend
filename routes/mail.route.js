@@ -6,7 +6,7 @@ import {
   markRead,
   starMail,
   trash,
-  unTrashMultipleMails,
+  unTrash,
 } from "../controllers/mail.controller.js";
 import multer from "multer";
 const router = express.Router();
@@ -18,6 +18,6 @@ router.route("/mark-read/:mailId").post(markRead);
 router.route("/star/:mailId").post(starMail);
 router.route("/trash").post(trash);
 router.route("/delete-multiple").delete(deleteMultipleMails);
-router.route("/untrash-multiple").post(unTrashMultipleMails);
+router.route("/untrash").post(unTrash);
 
 export default router;
