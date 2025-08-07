@@ -39,7 +39,7 @@ const createMail = async (req, res) => {
               resolve(result);
             }
           );
-          stream.end(file.buffer); // Pipe the buffer directly
+          stream.end(file.buffer);
         });
       };
 
@@ -192,43 +192,7 @@ const starMail = async (req, res) => {
   }
 };
 
-const trashMail = async (req, res) => {
-  try {
-    const user = req.session.user;
-    if (!user) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    const { mailId } = req.params;
-
-    if (!mailId) {
-      return res.status(400).json({ error: "Missing mail ID" });
-    }
-
-    const mail = await Mail.findById(mailId);
-
-    if (!mail) {
-      return res.status(404).json({ error: "Mail not found" });
-    }
-
-    if (mail.sender.toString() === user.id) {
-      mail.isTrashedBySender = true;
-    } else if (mail.recipient.toString() === user.id) {
-      mail.isTrashedByRecipient = true;
-    } else {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-
-    await mail.save();
-
-    res.status(200).json({ message: "Mail deleted successfully" });
-  } catch (error) {
-    console.error("Error in deleteMail:", error.message);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-const trashMultipleMails = async (req, res) => {
+const trash = async (req, res) => {
   try {
     const user = req.session.user;
     if (!user) {
@@ -263,7 +227,7 @@ const trashMultipleMails = async (req, res) => {
   }
 };
 
-const deleteManyMails = async (req, res) => {
+const deleteMultipleMails = async (req, res) => {
   try {
     const user = req.session.user;
     if (!user) {
@@ -300,7 +264,7 @@ const deleteManyMails = async (req, res) => {
   }
 };
 
-const unTrashManyMails = async (req, res) => {
+const unTrashMultipleMails = async (req, res) => {
   try {
     const user = req.session.user;
     if (!user) {
@@ -340,8 +304,7 @@ export {
   getRecentsMails,
   markRead,
   starMail,
-  trashMail,
-  trashMultipleMails,
-  deleteManyMails,
-  unTrashManyMails,
+  trash,
+  deleteMultipleMails,
+  unTrashMultipleMails,
 };
