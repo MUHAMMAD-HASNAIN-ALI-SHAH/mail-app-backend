@@ -1,7 +1,7 @@
 import express from "express";
 import {
   createMail,
-  deleteMultipleMails,
+  deleteMail,
   getRecentsMails,
   markRead,
   starMail,
@@ -17,7 +17,7 @@ router.route("/recent-mails").get(getRecentsMails);
 router.route("/mark-read/:mailId").post(markRead);
 router.route("/star/:mailId").post(starMail);
 router.route("/trash").post(trash);
-router.route("/delete-multiple").delete(deleteMultipleMails);
+router.route("/delete").delete(deleteMail);
 router.route("/untrash").post(unTrash);
 
 export default router;

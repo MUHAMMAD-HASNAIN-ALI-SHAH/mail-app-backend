@@ -227,7 +227,7 @@ const trash = async (req, res) => {
   }
 };
 
-const deleteMultipleMails = async (req, res) => {
+const deleteMail = async (req, res) => {
   try {
     const user = req.session.user;
     if (!user) {
@@ -305,6 +305,6 @@ export {
   markRead,
   starMail,
   trash,
-  deleteMultipleMails,
+  deleteMail,
   unTrash
 };
