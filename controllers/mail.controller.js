@@ -6,11 +6,11 @@ import { io } from "../config/socket.js";
 
 const createMail = async (req, res) => {
   try {
-    let { username, subject, body } = req.body;
-    const file = req.file;
-    const senderId = req.session.user?.id;
+    let { username, subject, body, file } = req.body;
 
-    if (!username || !subject || !body || !senderId) {
+    const sender = req.session.user;
+
+    if (!username || !subject || !body) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -21,43 +21,15 @@ const createMail = async (req, res) => {
       return res.status(404).json({ error: "Recipient not found" });
     }
 
-    if (recipient._id.toString() === senderId) {
+    if (recipient._id.toString() === sender.id) {
       return res.status(400).json({ error: "Cannot send mail to yourself" });
     }
 
-    let attachment = null;
-    if (file) {
-      const streamUpload = () => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            {
-              folder: "mail-attachments",
-              access_mode: "public"
-            },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          stream.end(file.buffer);
-        });
-      };
-
-      const uploadResult = await streamUpload();
-
-      attachment = {
-        url: uploadResult.secure_url,
-        fileName: file.originalname,
-        fileType: file.mimetype,
-      };
-    }
-
     const newMail = new Mail({
-      sender: senderId,
+      sender: sender.id,
       recipient: recipient._id,
       subject,
       body,
-      attachments: attachment ? [attachment] : [],
       isReadBySender: true,
       isReadByRecipient: false,
       isStarredBySender: false,
@@ -66,6 +38,13 @@ const createMail = async (req, res) => {
       isTrashedByRecipient: false,
       threadId: null,
     });
+
+    if (file) {
+      const url = await cloudinary.uploader.upload(file, {
+        folder: "mail-app",
+      });
+      newMail.attachment = url.secure_url;
+    }
 
     const savedMail = await newMail.save();
 
@@ -306,5 +285,5 @@ export {
   starMail,
   trash,
   deleteMail,
-  unTrash
+  unTrash,
 };

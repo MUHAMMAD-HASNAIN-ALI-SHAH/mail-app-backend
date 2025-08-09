@@ -20,13 +20,9 @@ const mailSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    attachments: [
-      {
-        url: { type: String },
-        fileName: { type: String },
-        fileType: { type: String },
-      },
-    ],
+    attachment: {
+      type: String,
+    },
     isReadBySender: {
       type: Boolean,
       default: true,
